@@ -7,8 +7,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.media.Image
+import android.media.MediaScannerConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
@@ -24,26 +26,24 @@ import com.google.zxing.integration.android.IntentResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 
 import com.journeyapps.barcodescanner.ScanOptions
-
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.lang.System.out
 
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var textView: TextView
+
      lateinit var barcodeView: DecoratedBarcodeView
-    var  options =  ScanOptions()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val btn = findViewById<Button>(R.id.btn1)
+        val btn2 = findViewById<Button>(R.id.btn2)
 
-        options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
-        options.setCameraId(0)
-        options.setBeepEnabled(true);
-        options.setBarcodeImageEnabled(true);
-        options.setOrientationLocked(true);
-        options.setTorchEnabled(true)
+
 
         btn.setOnClickListener(){
             openCamera()
@@ -52,9 +52,14 @@ class MainActivity : AppCompatActivity() {
             integrator.setPrompt("Scan a barcode")
             integrator.setCameraId(0) // Use the rear camera
             integrator.setBeepEnabled(false)
-            integrator.setOrientationLocked(true)
+            integrator.setOrientationLocked(false)
+            integrator.setBarcodeImageEnabled(true)
             integrator.initiateScan()
 
+
+        }
+
+        btn2.setOnClickListener(){
 
         }
 
@@ -132,12 +137,42 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
-    }
 
+        //think how to remove it in separate function
+        val bitmap = data?.extras?.getString("data") as Bitmap
+
+        val file = File(Environment.getExternalStorageDirectory(), "image.jpg")
+        val fos = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+        fos.flush()
+        fos.close()
+        MediaScannerConnection.scanFile(
+                applicationContext,
+        arrayOf(file.toString()),
+        arrayOf("image/jpeg"),
+        null
+        )
+
+    }
 
     companion object{
         const val REQUEST_CODE = 1
     }
+
+    // NOT UNDERSTAND YET HOW TO USE RIGHT
+   /* private fun saveImageFromCamera(data: Intent?){
+        val bitmap = data?.extras?.getString("data") as Bitmap
+        var byteOutStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutStream)
+        byteOutStream.flush()
+        byteOutStream.close()
+        MediaScannerConnection.scanFile(
+            applicationContext,
+            arrayOf(file.toString()),
+            arrayOf("image/jpeg"),
+            null
+        )
+    }*/
 }
 
 

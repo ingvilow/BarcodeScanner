@@ -1,6 +1,8 @@
 package com.example.vanillamvvmproject
 
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,7 @@ class BarcodeScanner : AppCompatActivity()  {
         val  barcodeTextView = findViewById<TextView>(R.id.txt_result)
         val barcodeValue = intent.getStringExtra("barcodeValue")
         barcodeTextView.text = barcodeValue
+
     }
 
 }
