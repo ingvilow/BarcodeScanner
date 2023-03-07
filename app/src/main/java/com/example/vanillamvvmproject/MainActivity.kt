@@ -23,6 +23,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val btn = findViewById<Button>(R.id.btn1)
-
+        val floating_btn = findViewById<FloatingActionButton>(R.id.floating_btn1)
         btn.setOnClickListener(){
             openCamera()
             val integrator = IntentIntegrator(this)
@@ -55,6 +56,12 @@ class MainActivity : AppCompatActivity() {
             integrator.initiateScan()
 
 
+        }
+
+        floating_btn.setOnClickListener(){
+            val intent = Intent(this, TakeAndSavePhotoActivity::class.java)
+            intent.putExtra("savePhoto", 1)
+            startActivity(intent)
         }
 
     }
