@@ -3,8 +3,11 @@ package com.example.vanillamvvmproject
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.Image
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -26,9 +29,11 @@ class BarcodeScanner : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.barcode_layout)
-        val  barcodeTextView = findViewById<TextView>(R.id.txt_result)
-        val barcodeValue = intent.getStringExtra("barcodeValue")
-        barcodeTextView.text = barcodeValue
+        var  imgBarcode = findViewById<ImageView>(R.id.barcode_image_result)
+        val byteArray = intent.getByteArrayExtra("image")
+        val bitmap = byteArray?.let { BitmapFactory.decodeByteArray(byteArray, 0, it.size) }
+        imgBarcode.setImageBitmap(bitmap)
+
     }
 
 }
