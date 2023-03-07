@@ -5,12 +5,15 @@
       <map>
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/activity_barcode_scanner.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/activity_main.xml" value="0.24010416666666667" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/activity_take_and_save_photo.xml" value="0.2" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/barcode_layout.xml" value="0.253125" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/barcode_result.xml" value="0.21428571428571427" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/barcode_scanner_layout.xml" value="0.253125" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/content_barcode_scanner.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/fragment_scan.xml" value="0.24010416666666667" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/fragment_second.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/scan_barcode_layout.xml" value="0.1" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/VanillaMVVMProject/app/src/main/res/layout/take_and_save_photo_layout.xml" value="0.2375" />
       </map>
     </option>
   </component>

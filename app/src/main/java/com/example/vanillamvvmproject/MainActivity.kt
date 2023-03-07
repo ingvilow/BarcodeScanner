@@ -1,14 +1,19 @@
 package com.example.vanillamvvmproject
 
-import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.Manifest.permission.CAMERA
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+
 import android.graphics.Bitmap
-import android.media.Image
+
+import android.media.MediaScannerConnection
+import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
@@ -18,44 +23,45 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
-
 import com.journeyapps.barcodescanner.ScanOptions
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.security.Permission
 
 
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var textView: TextView
-     lateinit var barcodeView: DecoratedBarcodeView
-    var  options =  ScanOptions()
+    lateinit var barcodeView: DecoratedBarcodeView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val btn = findViewById<Button>(R.id.btn1)
-
-        options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
-        options.setCameraId(0)
-        options.setBeepEnabled(true);
-        options.setBarcodeImageEnabled(true);
-        options.setOrientationLocked(true);
-        options.setTorchEnabled(true)
-
+        val floating_btn = findViewById<FloatingActionButton>(R.id.floating_btn1)
         btn.setOnClickListener(){
             openCamera()
             val integrator = IntentIntegrator(this)
             integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
             integrator.setPrompt("Scan a barcode")
-            integrator.setCameraId(0) // Use the rear camera
-            integrator.setBeepEnabled(false)
-            integrator.setOrientationLocked(true)
+            integrator.setCameraId(0)
+            integrator.setBeepEnabled(true)
+            integrator.setOrientationLocked(false)
             integrator.initiateScan()
 
 
+        }
+
+        floating_btn.setOnClickListener(){
+            val intent = Intent(this, TakeAndSavePhotoActivity::class.java)
+            intent.putExtra("savePhoto", 1)
+            startActivity(intent)
         }
 
     }
@@ -139,6 +145,9 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_CODE = 1
     }
 }
+
+
+
 
 
 
