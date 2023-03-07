@@ -17,73 +17,75 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.zxing.integration.android.IntentIntegrator
+import com.google.zxing.integration.android.IntentResult
+import com.journeyapps.barcodescanner.DecoratedBarcodeView
+import com.journeyapps.barcodescanner.ScanOptions
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.security.Permission
 
 
+
 class MainActivity : AppCompatActivity() {
 
-
+    lateinit var textView: TextView
+    lateinit var barcodeView: DecoratedBarcodeView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val btn = findViewById<Button>(R.id.btn1)
-       /* val btn2 = findViewById<Button>(R.id.btn2)
-        btn2.setOnClickListener(){
 
-        }*/
+        val btn = findViewById<Button>(R.id.btn1)
 
         btn.setOnClickListener(){
             openCamera()
-            capturePhoto()
+            val integrator = IntentIntegrator(this)
+            integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
+            integrator.setPrompt("Scan a barcode")
+            integrator.setCameraId(0)
+            integrator.setBeepEnabled(true)
+            integrator.setOrientationLocked(false)
+            integrator.initiateScan()
+
+
         }
 
     }
 
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val img = findViewById<ImageView>(R.id.img)
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == CAMERA_RESULT_TAKEN_PHOTO && resultCode == Activity.RESULT_OK) {
-            val photoBitmap = data?.extras?.get("data") as Bitmap
-            img.setImageBitmap(photoBitmap)
-            savePhoto(photoBitmap, data)
-            savePhotoToGallery(data)
+    private val barcodeLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val contents: String? =
+            IntentIntegrator.parseActivityResult(result.resultCode, result.data).contents
+        if (contents == null) {
+            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "Scanned: $contents", Toast.LENGTH_LONG).show()
         }
     }
 
 
-
-    fun openCamera() {
-        if (ContextCompat.checkSelfPermission(
-                this@MainActivity,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) !==
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@MainActivity,
-                    android.Manifest.permission.CAMERA
-                )
-            ) {
-                ActivityCompat.requestPermissions(
-                    this@MainActivity,
-                    arrayOf(android.Manifest.permission.CAMERA), MainActivity.REQUEST_CODE
-                )
+    fun openCamera(){
+        if (ContextCompat.checkSelfPermission(this@MainActivity,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) !==
+            PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity,
+                    android.Manifest.permission.CAMERA)) {
+                ActivityCompat.requestPermissions(this@MainActivity,
+                    arrayOf(android.Manifest.permission.CAMERA), REQUEST_CODE)
             } else {
-                ActivityCompat.requestPermissions(
-                    this@MainActivity,
-                    arrayOf(android.Manifest.permission.CAMERA), MainActivity.REQUEST_CODE
-                )
+                ActivityCompat.requestPermissions(this@MainActivity,
+                    arrayOf(android.Manifest.permission.CAMERA), REQUEST_CODE)
             }
-        }else{
-            capturePhoto()
         }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -92,109 +94,53 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-
-            PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE -> {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show()
-                }
-                return
-            }
-            REQUEST_CODE ->{
-                if(grantResults.isNotEmpty() && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED){
+        when (REQUEST_CODE) {
+            1 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED) {
                     if ((ContextCompat.checkSelfPermission(this@MainActivity,
                             android.Manifest.permission.CAMERA) ===
                                 PackageManager.PERMISSION_GRANTED)) {
                         Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show()
                         capturePhoto()
+                        barcodeView.resume()
                     }
-                }else{
-                    Toast.makeText(this, "I was ignored", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_LONG).show()
                 }
+                return
             }
         }
-        return
     }
+
     fun capturePhoto(){
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(cameraIntent, REQUEST_CODE)
     }
 
-    private fun savePhotoToGallery(data: Intent?) {
-        val bitmap = data?.extras?.get("data") as Bitmap
-        val photoUri = savePhoto(bitmap, data)
 
-        if (photoUri != null) {
-            Toast.makeText(this, "Photo saved to gallery", Toast.LENGTH_SHORT).show()
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val result: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null) {
+            val intent = Intent(this, BarcodeScanner::class.java)
+            barcodeLauncher.launch(intent)
+            val barcodeValue = result.contents
+            intent.putExtra("barcodeValue", barcodeValue)
+            startActivity(intent)
         } else {
-            Toast.makeText(this, "Failed to save photo to gallery", Toast.LENGTH_SHORT).show()
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
-
-    private fun savePhoto(bitmap: Bitmap, data: Intent?) {
-        val photo = data?.extras?.get("data") as Bitmap?
-        if (photo != null) {
-            val fileName = "image_${System.currentTimeMillis()}.jpg"
-            val resolver = applicationContext.contentResolver
-            val imageCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-            } else {
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            }
-
-            val contentValues = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.Images.Media.IS_PENDING, 1)
-                }
-            }
-
-            val imageUri = resolver.insert(imageCollection, contentValues)
-
-            imageUri?.let { uri ->
-                try {
-                    resolver.openOutputStream(uri).use { outputStream ->
-                        outputStream?.let {
-                            photo.compress(Bitmap.CompressFormat.PNG, 100, it)
-                        }
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        contentValues.clear()
-                        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                        resolver.update(uri, contentValues, null, null)
-                    }
-                    Toast.makeText(
-                        applicationContext,
-                        "Photo saved successfully!",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } catch (e: IOException) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Failed to save photo",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        } else {
-            Toast.makeText(applicationContext, "Failed to get photo", Toast.LENGTH_LONG).show()
-        }
-    }
-
 
 
     companion object{
-        const val CAMERA_RESULT_TAKEN_PHOTO = 1
-        const val  REQUEST_CODE = 1
-        const val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1
+        const val REQUEST_CODE = 1
     }
 }
+
+
+
 
 
 
