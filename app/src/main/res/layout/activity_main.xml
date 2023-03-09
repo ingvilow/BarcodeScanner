@@ -8,9 +8,9 @@
 
     <TextView
         android:id="@+id/txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Press the button to start scan any type of codes!"
+        android:layout_width="333dp"
+        android:layout_height="45dp"
+        android:text="Нажмите кнопку, чтобы начатьс сканнирование"
         app:fontFamily="sans-serif-smallcaps"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,9 +23,9 @@
         android:id="@+id/barcode_image_result1"
         android:layout_width="356dp"
         android:layout_height="165dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="64dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintHorizontal_bias="0.709"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txt">
 
@@ -35,13 +35,12 @@
         android:id="@+id/btn1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start scan"
+        android:layout_marginBottom="316dp"
+        android:text="Начать сканирование"
         app:backgroundTint="#A5CBE8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.094" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_btn1"
@@ -49,9 +48,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="40dp"
-        android:contentDescription="1"
         android:elevation="2dp"
-        app:backgroundTint="#2196F3"
+        app:backgroundTint="#709FC5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

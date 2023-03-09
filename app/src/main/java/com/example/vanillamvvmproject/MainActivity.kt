@@ -2,8 +2,6 @@ package com.example.vanillamvvmproject
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
@@ -21,7 +19,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
-import java.io.ByteArrayOutputStream
+import org.json.JSONObject
 
 
 class MainActivity : AppCompatActivity() {
@@ -41,7 +39,8 @@ class MainActivity : AppCompatActivity() {
             integrator.setPrompt("Scan a barcode")
             integrator.setBarcodeImageEnabled(true);
             integrator.setCameraId(0)
-            integrator.setBeepEnabled(false)
+            integrator.setBeepEnabled(true)
+            integrator.setTorchEnabled(true)
             integrator.setOrientationLocked(false)
             integrator.initiateScan()
 
@@ -121,25 +120,12 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
-            val barcodeValue = result.barcodeImagePath
-            if (barcodeValue != null) {
-                val imageBytes = Base64.decode(barcodeValue, Base64.DEFAULT)
-                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                if(decodedImage != null){
-                    val outputStream = ByteArrayOutputStream()
-                    decodedImage.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                    val pngBytes = outputStream.toByteArray()
-                    System.out.println(pngBytes)
-                    val intent = Intent(this, BarcodeScanner::class.java)
-                    intent.putExtra("image", pngBytes)
-
-                    startActivity(intent)
-                }else{
-                   System.out.println("no")
-                }
-
-            }
-
+            val barcodeValue = result.contents
+            val decodedBytes = Base64.decode(barcodeValue, Base64.DEFAULT)
+            val decodedString = String(decodedBytes, Charsets.UTF_8)
+            val intent = Intent(this, BarcodeScanner::class.java)
+            intent.putExtra("info", decodedString)
+            startActivity(intent)
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }

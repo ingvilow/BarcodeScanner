@@ -29,10 +29,11 @@ class BarcodeScanner : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.barcode_layout)
-        var  imgBarcode = findViewById<ImageView>(R.id.barcode_image_result)
-        val byteArray = intent.getByteArrayExtra("image")
-        val bitmap = byteArray?.let { BitmapFactory.decodeByteArray(byteArray, 0, it.size) }
-        imgBarcode.setImageBitmap(bitmap)
+        val  barcodeTextView = findViewById<TextView>(R.id.txt_result)
+       // val clearBtn = findViewById<Button>(R.id.btn_clear)
+        val barcodeValue = intent.getStringExtra("info")
+        barcodeTextView.text = barcodeValue
+
 
     }
 
