@@ -7,15 +7,43 @@
 
 
     <TextView
-        android:id="@+id/txt_result"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Press the button to start scan!"
+        android:id="@+id/txt_result2"
+        android:layout_width="252dp"
+        android:layout_height="43dp"
+        android:text="Результат сканнирования баркода:"
+        app:fontFamily="sans-serif-smallcaps"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.578"
+        app:layout_constraintHorizontal_bias="0.61"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.456" />
+        app:layout_constraintVertical_bias="0.077" />
+
+    <TextView
+        android:id="@+id/txt_result"
+        android:layout_width="227dp"
+        android:layout_height="183dp"
+        android:text="Your final scanning's result is below"
+        app:fontFamily="sans-serif-smallcaps"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.574"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.38" />
+
+
+    <Button
+        android:id="@+id/clear_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="272dp"
+        android:text="Очистить результат"
+        app:backgroundTint="#A5CBE8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.57"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

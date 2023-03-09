@@ -1,57 +1,46 @@
 package com.example.vanillamvvmproject
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-
-import android.graphics.Bitmap
-
-import android.media.MediaScannerConnection
-import android.net.Uri
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
+import android.util.Base64
+import android.util.Log
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
-import com.journeyapps.barcodescanner.ScanOptions
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.security.Permission
-
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import org.json.JSONObject
 
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var textView: TextView
     lateinit var barcodeView: DecoratedBarcodeView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+       barcodeView = findViewById(R.id.barcode_image_result1)
         val btn = findViewById<Button>(R.id.btn1)
         val floating_btn = findViewById<FloatingActionButton>(R.id.floating_btn1)
         btn.setOnClickListener(){
             openCamera()
             val integrator = IntentIntegrator(this)
-            integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
+           // integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
             integrator.setPrompt("Scan a barcode")
+            integrator.setBarcodeImageEnabled(true);
             integrator.setCameraId(0)
             integrator.setBeepEnabled(true)
+            integrator.setTorchEnabled(true)
             integrator.setOrientationLocked(false)
             integrator.initiateScan()
 
@@ -110,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                                 PackageManager.PERMISSION_GRANTED)) {
                         Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show()
                         capturePhoto()
-                        barcodeView.resume()
+                        barcodeView.barcodeView.decoderFactory = DefaultDecoderFactory(arrayListOf(BarcodeFormat.PDF_417, BarcodeFormat.QR_CODE))
                     }
                 } else {
                     Toast.makeText(this, "Permission Denied", Toast.LENGTH_LONG).show()
@@ -119,6 +108,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     fun capturePhoto(){
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -130,15 +120,17 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
-            val intent = Intent(this, BarcodeScanner::class.java)
-            barcodeLauncher.launch(intent)
             val barcodeValue = result.contents
-            intent.putExtra("barcodeValue", barcodeValue)
+            val decodedBytes = Base64.decode(barcodeValue, Base64.DEFAULT)
+            val decodedString = String(decodedBytes, Charsets.UTF_8)
+            val intent = Intent(this, BarcodeScanner::class.java)
+            intent.putExtra("info", decodedString)
             startActivity(intent)
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
+
 
 
     companion object{
